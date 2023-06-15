@@ -52,7 +52,7 @@ public class RateLimitAspect {
         //获取注解每秒加入桶中的token
         double limitNum = annotation.limitNum();
         // 注解所在方法名区分不同的限流策略
-        String functionName = msig.getName();
+        String functionName = annotation.name();
 
         if (RATE_LIMITER.containsKey(functionName)) {
             rateLimiter = RATE_LIMITER.get(functionName);

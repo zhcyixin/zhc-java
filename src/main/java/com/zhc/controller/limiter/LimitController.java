@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class LimitController {
 
     @GetMapping("/guavaLimiter")
-    @Limiter(limitNum = 6,name = "LimitController")
+    @Limiter(limitNum = 5,name = "LimitController")
     public String generateException(){
         String retStr = "接口正常执行";
         System.out.println(retStr);
