@@ -107,6 +107,7 @@ public class RLockController {
         // 加锁不成功，返回给前端错误码，前端给用户友好提示
         if (Boolean.FALSE.equals(lockResult)) {
             log.info("系统繁忙，请稍后再试！");
+            return ;
         }
         reduceStock();
         // 判断是不是当前请求的UUID，如果是则可以正常释放锁。如果不是，则释放锁失败！
