@@ -1,5 +1,8 @@
 server:
   port: 8081
+  tomcat:
+    threads:
+      max: 1
 spring:
   redis:
     host: localhost
