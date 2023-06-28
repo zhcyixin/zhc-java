@@ -1,26 +1,27 @@
 package com.zhc.controller.hole;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 /**
- * 线程重用：
- * 1、线程池的核心是线程重用，线程重用能够有效的减小线程频繁创建，减小时间消耗，便于线程管理；
- * 2、SpringBoot项目程序运行在 Tomcat 中，执行程序的线程是 Tomcat 的工作线程，而 Tomcat 的工作线程是基于线程池的。
+ * 使用并发工具类库，就不担心线程安全问题了吗？
+ * 1、线程重用问题；
+ * 2、使用线程安全类就一定线程安全吗？
+ * 3、ConcurrentHashMap原子性用法；
+ * 4、copyOnWriteArrayList使用场景需要明确。
+
  * @author zhouhengchao
  * @since 2023-06-27 14:12:00
  * @version 1.0
@@ -33,6 +34,9 @@ public class ThreadToolController {
     private static final ThreadLocal<Integer> currentStudent = ThreadLocal.withInitial(() -> null);
 
     /**
+     * 1、线程池的核心是线程重用，线程重用能够有效的减小线程频繁创建，减小时间消耗，便于线程管理；
+     * 2、SpringBoot项目程序运行在 Tomcat 中，执行程序的线程是 Tomcat 的工作线程，而 Tomcat 的工作线程是基于线程池的。
+     *
      * 需求描述：为每一个学生缓存学号信息，在线程间隔离变量，在方法或类间共享，使用ThreadLocal进行缓存
      * 缓存前先获取上一次的值，然后按照传入的学号信息设值，并一起打印出来;
      * 为了复现出问题，将tomcat线程池最大线程数配置为1，server.tomcat.threads.max = 1，保证两次都是请求的同一个线程
@@ -108,6 +112,7 @@ public class ThreadToolController {
 
         ForkJoinPool forkJoinPool = new ForkJoinPool(THREAD_COUNT);
         //使用线程池并发处理逻辑
+        // forkJoinPool 分治法、工作窃取思想
         forkJoinPool.execute(() -> IntStream.rangeClosed(1, 10).parallel().forEach(i -> {
             //查询还需要补充多少个元素
             int gap = ITEM_COUNT - concurrentHashMap.size();
@@ -153,4 +158,157 @@ public class ThreadToolController {
         log.info("finish size:{}", concurrentHashMap.size());
         return "OK";
     }
+
+    /**
+     * 使用并发工具类需要使用一些高级用法，保证原子性
+     * 如下代码使用ConcurrentHashMap实现key的计数器
+     */
+
+    //循环次数
+    private static int LOOP_COUNT = 10000000;
+    //线程数量
+    private static int THREAD_NUM = 10;
+    //元素数量
+    private static int ITEM_NUM = 10;
+    private Map<String, Long> normaluse() throws InterruptedException {
+        ConcurrentHashMap<String, Long> freqs = new ConcurrentHashMap<>(ITEM_COUNT);
+        ForkJoinPool forkJoinPool = new ForkJoinPool(THREAD_NUM);
+        forkJoinPool.execute(() -> IntStream.rangeClosed(1, LOOP_COUNT).parallel().forEach(i -> {
+                    //获得一个随机的Key
+                    String key = "item" + ThreadLocalRandom.current().nextInt(ITEM_NUM);
+                    synchronized (freqs) {
+                        if (freqs.containsKey(key)) {
+                            //Key存在则+1
+                            freqs.put(key, freqs.get(key) + 1);
+                        } else {
+                            //Key不存在则初始化为1
+                            freqs.put(key, 1L);
+                        }
+                    }
+                }
+        ));
+        forkJoinPool.shutdown();
+        forkJoinPool.awaitTermination(1, TimeUnit.HOURS);
+        return freqs;
+    }
+
+    /**
+     * 1、使用 ConcurrentHashMap 的原子性方法 computeIfAbsent 来做复合逻辑操作，判断 Key 是否存在 Value，
+     * 如果不存在则把 Lambda 表达式运行后的结果放入 Map 作为 Value，也就是新创建一个 LongAdder 对象，最后返回 Value。
+     * 2、由于 computeIfAbsent 方法返回的 Value 是 LongAdder，是一个线程安全的累加器，因此可以直接调用其 increment 方法进行累加
+     * @return
+     * @throws InterruptedException
+     */
+    private Map<String, Long> gooduse() throws InterruptedException {
+        ConcurrentHashMap<String, LongAdder> freqs = new ConcurrentHashMap<>(ITEM_NUM);
+        ForkJoinPool forkJoinPool = new ForkJoinPool(THREAD_NUM);
+        forkJoinPool.execute(() -> IntStream.rangeClosed(1, LOOP_COUNT).parallel().forEach(i -> {
+                    String key = "item" + ThreadLocalRandom.current().nextInt(ITEM_NUM);
+                    //利用computeIfAbsent()方法来实例化LongAdder，然后利用LongAdder来进行线程安全计数
+                    freqs.computeIfAbsent(key, k -> new LongAdder()).increment();
+                }
+        ));
+        forkJoinPool.shutdown();
+        forkJoinPool.awaitTermination(1, TimeUnit.HOURS);
+        //因为我们的Value是LongAdder而不是Long，所以需要做一次转换才能返回
+        return freqs.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> e.getKey(),
+                        e -> e.getValue().longValue())
+                );
+    }
+
+    @GetMapping("good")
+    public String good() throws InterruptedException {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("normaluse");
+        Map<String, Long> normaluse = normaluse();
+        stopWatch.stop();
+        //校验元素数量
+        Assert.isTrue(normaluse.size() == ITEM_NUM, "normaluse size error");
+        //校验累计总数
+        Assert.isTrue(normaluse.entrySet().stream()
+                        .mapToLong(item -> item.getValue()).reduce(0, Long::sum) == LOOP_COUNT
+                , "normaluse count error");
+        stopWatch.start("gooduse");
+        Map<String, Long> gooduse = gooduse();
+        stopWatch.stop();
+        Assert.isTrue(gooduse.size() == ITEM_NUM, "gooduse size error");
+        Assert.isTrue(gooduse.entrySet().stream()
+                        .mapToLong(item -> item.getValue())
+                        .reduce(0, Long::sum) == LOOP_COUNT
+                , "gooduse count error");
+        log.info(stopWatch.prettyPrint());
+        return "OK";
+    }
+
+    //测试并发写的性能
+    @GetMapping("write")
+    public Map testWrite() {
+        List<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+        List<Integer> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+        StopWatch stopWatch = new StopWatch();
+        int loopCount = 100000;
+        stopWatch.start("Write:copyOnWriteArrayList");
+        //循环100000次并发往CopyOnWriteArrayList写入随机元素
+        IntStream.rangeClosed(1, loopCount).parallel().forEach(__ -> copyOnWriteArrayList.add(ThreadLocalRandom.current().nextInt(loopCount)));
+        stopWatch.stop();
+        stopWatch.start("Write:synchronizedList");
+        //循环100000次并发往加锁的ArrayList写入随机元素
+        IntStream.rangeClosed(1, loopCount).parallel().forEach(__ -> synchronizedList.add(ThreadLocalRandom.current().nextInt(loopCount)));
+        stopWatch.stop();
+        log.info(stopWatch.prettyPrint());
+        Map result = new HashMap();
+        result.put("copyOnWriteArrayList", copyOnWriteArrayList.size());
+        result.put("synchronizedList", synchronizedList.size());
+        return result;
+    }
+
+    //帮助方法用来填充List
+    private void addAll(List<Integer> list) {
+        list.addAll(IntStream.rangeClosed(1, 1000000).boxed().collect(Collectors.toList()));
+    }
+
+    //测试并发读的性能
+    @GetMapping("read")
+    public Map testRead() {
+        //创建两个测试对象
+        List<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+        List<Integer> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+        //填充数据
+        addAll(copyOnWriteArrayList);
+        addAll(synchronizedList);
+        StopWatch stopWatch = new StopWatch();
+        int loopCount = 1000000;
+        int count = copyOnWriteArrayList.size();
+        stopWatch.start("Read:copyOnWriteArrayList");
+        //循环1000000次并发从CopyOnWriteArrayList随机查询元素
+        IntStream.rangeClosed(1, loopCount).parallel().forEach(i -> copyOnWriteArrayList.get(ThreadLocalRandom.current().nextInt(count)));
+        stopWatch.stop();
+        stopWatch.start("Read:synchronizedList");
+        //循环1000000次并发从加锁的ArrayList随机查询元素
+        IntStream.range(0, loopCount).parallel().forEach(i -> synchronizedList.get(ThreadLocalRandom.current().nextInt(count)));
+        stopWatch.stop();
+        log.info(stopWatch.prettyPrint());
+        Map result = new HashMap();
+        result.put("copyOnWriteArrayList", copyOnWriteArrayList.size());
+        result.put("synchronizedList", synchronizedList.size());
+        return result;
+    }
+
+    /**
+     * 总结：
+     * 1、只知道使用并发工具，但并不清楚当前线程的来龙去脉，解决多线程问题却不了解线程。比如，使用 ThreadLocal 来缓存数据，以为 ThreadLocal
+     * 在线程之间做了隔离不会有线程安全问题，没想到线程重用导致数据串了。请务必记得，在业务逻辑结束之前清理 ThreadLocal 中的数据。
+     *
+     * 2、误以为使用了并发工具就可以解决一切线程安全问题，期望通过把线程不安全的类替换为线程安全的类来一键解决问题。比如，认为使用了 ConcurrentHashMap
+     * 就可以解决线程安全问题，没对复合逻辑加锁导致业务逻辑错误。如果你希望在一整段业务逻辑中，对容器的操作都保持整体一致性的话，需要加锁处理。
+     *
+     * 3、没有充分了解并发工具的特性，还是按照老方式使用新工具导致无法发挥其性能。比如，使用了 ConcurrentHashMap，但没有充分利用其提供的基于 CAS 安全的方法，
+     * 还是使用锁的方式来实现逻辑。你可以阅读一下ConcurrentHashMap 的文档，看一下相关原子性操作 API 是否可以满足业务需求，如果可以则优先考虑使用。
+     *
+     * 4、没有了解清楚工具的适用场景，在不合适的场景下使用了错误的工具导致性能更差。比如，没有理解 CopyOnWriteArrayList 的适用场景，
+     * 把它用在了读写均衡或者大量写操作的场景下，导致性能问题。对于这种场景，你可以考虑是用普通的 List。
+     */
+
 }
