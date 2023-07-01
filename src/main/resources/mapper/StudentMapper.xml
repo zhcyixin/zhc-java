@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhc.dao.StudentMapper">
+    <select id="selectStudentList" resultType="com.zhc.model.vo.StudentCourseVo">
+        select a.id,a.name,a.stu_no as stuNo,a.age,
+        b.course_name as courseName,b.course_type as courseType,
+        b.already_hours as alreadyHours
+        from student a inner join course b on a.id = b.student_id
+        and a.id in (1,2,3)
+        group by a.id
+        order by a.id desc
+    </select>
+
+    <select id="selectStudentList1" resultType="com.zhc.model.vo.StudentCourseVo">
+        select a.id,a.name,a.stu_no as stuNo,a.age,
+               b.course_name as courseName,b.course_type as courseType,
+               b.already_hours as alreadyHours
+        from student a inner join course b on a.id = b.student_id
+            and a.id in (1,2,3)
+        group by a.id
+        order by a.id desc
+    </select>
+
+    <select id="selectStudentList1_COUNT" resultType="java.lang.Integer">
+        select count(a.id)
+        from student a inner join course b on a.id = b.student_id
+            and a.id in (1,2,3)
+        group by a.id
+    </select>
+
+    <select id="selectStudentList2" resultType="com.zhc.model.vo.StudentCourseVo">
+        select a.id,a.name,a.stu_no as stuNo,a.age,
+               b.course_name as courseName,b.course_type as courseType,
+               b.already_hours as alreadyHours
+        from student a inner join course b on a.id = b.student_id
+            and a.id in (1,2,3)
+        group by a.id
+        order by a.id desc
+    </select>
+
+    <select id="selectStudentList3" resultType="com.zhc.model.vo.StudentCourseVo">
+        select a.id,a.name,a.stu_no as stuNo,a.age,
+               b.course_name as courseName,b.course_type as courseType,
+               b.already_hours as alreadyHours
+        from student a inner join course b on a.id = b.student_id
+            and a.id in (1,2,3)
+        group by a.id
+        order by a.id desc
+    </select>
+
+    <select id="selectStudentList4" resultType="com.zhc.model.vo.StudentCourseVo">
+        select a.id,a.name,a.stu_no as stuNo,a.age,
+               b.course_name as courseName,b.course_type as courseType,
+               b.already_hours as alreadyHours
+        from student a inner join course b on a.id = b.student_id
+            and a.id in (1,2,3)
+        group by a.id
+        order by a.id desc
+        limit #{index},#{pageSiz}
+    </select>
+</mapper>
