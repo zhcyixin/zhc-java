@@ -2,7 +2,6 @@ package com.zhc.mybatis;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Lists;
 import com.zhc.dao.StudentMapper;
 import com.zhc.model.request.OtherPageRequest;
 import com.zhc.model.request.PageRequest;
@@ -12,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Mybatis-pageHelper分页插件使用中的坑
@@ -98,7 +98,20 @@ public class MybatisTest {
         otherPageRequest.setIndex(otherPageRequest.getPageNu() == 1 ? 0 : (otherPageRequest.getPageNu() - 1)
                 * otherPageRequest.getPageSiz());
         List<StudentCourseVo> students = studentMapper.selectStudentList4(otherPageRequest);
+
         PageInfo<StudentCourseVo> pageInfo = new PageInfo<>(students);
+        pageInfo.setPageNum(otherPageRequest.getPageNu());
+        pageInfo.setPageSize(otherPageRequest.getPageSiz());
+        pageInfo.setTotal(Long.MAX_VALUE);
+        if(students.size() < otherPageRequest.getPageSiz()){
+            pageInfo.setIsLastPage(Boolean.TRUE);
+            if (Objects.nonNull(otherPageRequest.getIndex())) {
+                int total = Objects.equals(otherPageRequest.getIndex(), 0) ? students.size() : otherPageRequest.getIndex() + students.size();
+                pageInfo.setTotal(Long.valueOf(total));
+            }
+        }else{
+            pageInfo.setIsLastPage(Boolean.FALSE);
+        }
 
         System.out.println(pageInfo);
     }
