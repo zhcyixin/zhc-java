@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @version 1.0
  */
 @SpringBootApplication
-@MapperScan(basePackages = {"com.zhc.dao"})
+@MapperScan(basePackages = {"com.zhc.dao","com.zhc.controller.hole.transactional"})
 public class ZhcJavaApplication {
 
     public static void main(String[] args) {
