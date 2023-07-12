@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhc.controller.hole.transactional.AccountInfoMapper">
+
+    <!--根据密码-查询账号信息列表-->
+    <select id="findAccountByPassword" resultType="com.zhc.controller.hole.transactional.AccountInfo">
+        select id,name,password from account_info
+        where password = #{password}
+    </select>
+
+</mapper>

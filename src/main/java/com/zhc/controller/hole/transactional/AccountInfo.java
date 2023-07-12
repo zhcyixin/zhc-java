@@ -6,13 +6,13 @@ import lombok.Data;
 
 
 /**
- * 定义一个用户实体类，包括主键id、用户姓名
+ * 定义一个账户实体类，包括主键id、账号名称、密码
  * @author zhouhengchao
  * @since 2023-07-08 16:27:00
  * @version 1.0
  */
 @Data
-public class User {
+public class AccountInfo {
 
     /**
      * 主键id
@@ -21,11 +21,17 @@ public class User {
     private Integer id;
 
     /**
-     * 用户姓名
+     * 账号名称
      */
     private String name;
 
-    public User(String name){
+    /**
+     * 账号密码
+     */
+    private String password;
+
+    public AccountInfo(String name,String password){
         this.name = name;
+        this.password = password;
     }
 }
