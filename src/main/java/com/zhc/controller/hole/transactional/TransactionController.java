@@ -7,6 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Spring声明式事务中的坑
+ *
+ * @author zhouhengchao
+ * @since 2023-07-12 14:57:00
+ */
 @RestController
 @RequestMapping("/v1/zhc/java/hole/transaction")
 @Slf4j
@@ -80,4 +86,14 @@ public class TransactionController {
         }
         return accountInfoService.createAccountRight(name, password);
     }
+
+    /**
+     * 总结：
+     * 1、使用spring声明式事务注解@Transactional必须作用在public修饰的方法上，必须通过spring的bean注入才能生效；
+     * 2、事务和异常配合使用时要小心，事务被异常给吞掉了；
+     * 3、注意使用事务作用的范围，不要直接将注解@Transactional作用在一个很长逻辑的方法上，否则可能会出现长事务问题，长事务
+     * 问题会导致整个服务卡顿，进一步导致应用崩溃，应该将事务的粒度尽可能拆细一些，查询类操作放事务外。
+     *
+     *
+     */
 }
