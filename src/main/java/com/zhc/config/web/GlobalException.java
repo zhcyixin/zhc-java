@@ -1,5 +1,7 @@
 package com.zhc.config.web;
 
+import com.zhc.exception.BusinessException;
+import com.zhc.model.Result;
 import com.zhc.util.DingTalkSendMsgUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +21,12 @@ import java.util.Objects;
 @Slf4j
 @RestControllerAdvice
 public class GlobalException {
+
+    @ExceptionHandler(value = BusinessException.class)
+    public Result<?> exceptionHandler(BusinessException e) {
+        log.debug("发生业务异常", e);
+        return Result.error(e.getCode(), e.getMessage());
+    }
 
     @ExceptionHandler(Exception.class)
     public String exceptionHandler(Exception e, ServletRequest request){
