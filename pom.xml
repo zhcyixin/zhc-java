@@ -82,6 +82,7 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.4.3.1</version>
         </dependency>
+        <!--引入fast-object-diff 数据比对工具的maven依赖-->
         <dependency>
             <groupId>com.github.colincatsu</groupId>
             <artifactId>fast-object-diff</artifactId>

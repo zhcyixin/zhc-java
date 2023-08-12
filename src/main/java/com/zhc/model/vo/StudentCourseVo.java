@@ -1,8 +1,10 @@
 package com.zhc.model.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class StudentCourseVo {
 
     private Integer id;
