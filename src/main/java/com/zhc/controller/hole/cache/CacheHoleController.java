@@ -73,7 +73,7 @@ public class CacheHoleController {
     // 通过定义一个原子类变量，记录查询数据库次数
     private AtomicInteger atomicInteger = new AtomicInteger();
 
-//    @PostConstruct
+    @PostConstruct
     public void wrongInit() {
         //初始化1000个地区数据到Redis，所有缓存数据有效期30秒
         IntStream.rangeClosed(1, 1000).forEach(i ->
@@ -159,7 +159,7 @@ public class CacheHoleController {
      * 增大数据库压力，这种情况，就是我们常说的缓存击穿或缓存并发问题。
      *
      */
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         // 初始化一个热点数据key为hotData,并设置为5秒过期
         redissonClient.getBucket("com.hotData").set("hello_world",5, TimeUnit.SECONDS);
@@ -267,7 +267,7 @@ public class CacheHoleController {
 
     private BloomFilter<Integer> bloomFilter;
 
-    @PostConstruct
+//    @PostConstruct
     public void init2() {
         //创建布隆过滤器，元素数量10000，期望误判率1%
         bloomFilter = BloomFilter.create(Funnels.integerFunnel(), 10000, 0.01);
