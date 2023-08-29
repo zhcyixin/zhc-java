@@ -9,10 +9,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * TODO
- *
- * @author JiaoRui
- * @date 2023-07-12 11:55
+ * 自定义规则
+ * @author zhouhengchao
+ * @since  2023-07-12 11:55
  */
 public class MobileRule implements Rule {
 

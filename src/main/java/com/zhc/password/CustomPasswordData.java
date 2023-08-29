@@ -4,7 +4,7 @@ import lombok.Data;
 import org.passay.PasswordData;
 
 /**
- * 自定义密码参数
+ * 自定义密码校验参数
  * @author zhouhengchao
  * @since 2023-07-12 11:58
  */
