@@ -30,12 +30,13 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class DateHoleTest {
 
-//    private static ThreadLocal<SimpleDateFormat> threadSafeSimpleDateFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+    private static ThreadLocal<SimpleDateFormat> threadSafeSimpleDateFormat = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     /**
-     * 有小伙伴这样初始化过时间吗？初始化一个2019年12月31日11:12:13，输出的时间是 3029 年 1 月 31 日 11 点 12 分 13 秒，不符合预期值
+     * 有小伙伴这样初始化过时间吗？初始化一个2019年12月31日11:12:13，
+     * 输出的时间是 3029 年 1 月 31 日 11 点 12 分 13 秒，不符合预期值
      */
     @Test
     void testDateHole1(){
@@ -81,8 +82,8 @@ public class DateHoleTest {
         System.out.println("defaultLocale:" + Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.DECEMBER, 29,0,0,0);
-        SimpleDateFormat YYYY = new SimpleDateFormat("YYYY-MM-dd");
-//        SimpleDateFormat YYYY = new SimpleDateFormat("yyyy-MM-dd");
+//        SimpleDateFormat YYYY = new SimpleDateFormat("YYYY-MM-dd");
+        SimpleDateFormat YYYY = new SimpleDateFormat("yyyy-MM-dd");
         System.out.println("格式化: " + YYYY.format(calendar.getTime()));
         System.out.println("weekYear:" + calendar.getWeekYear());
         System.out.println("firstDayOfWeek:" + calendar.getFirstDayOfWeek());
@@ -108,8 +109,8 @@ public class DateHoleTest {
             threadPool.execute(() -> {
                 for (int j = 0; j < 10; j++) {
                     try {
-                        System.out.println(simpleDateFormat.parse("2020-01-01 11:12:13"));
-//                        System.out.println(threadSafeSimpleDateFormat.get().parse("2020-01-01 11:12:13"));
+//                        System.out.println(simpleDateFormat.parse("2020-01-01 11:12:13"));
+                       System.out.println(threadSafeSimpleDateFormat.get().parse("2020-01-01 11:12:13"));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -138,8 +139,8 @@ public class DateHoleTest {
     @Test
     void testDateHole7(){
         Date today = new Date();
-        Date nextMonth = new Date(today.getTime() + 30 * 1000 * 60 * 60 * 24);
-//        Date nextMonth = new Date(today.getTime() + 30L * 1000 * 60 * 60 * 24);
+        // Date nextMonth = new Date(today.getTime() + 30 * 1000 * 60 * 60 * 24);
+        Date nextMonth = new Date(today.getTime() + 30L * 1000 * 60 * 60 * 24);
         System.out.println(today);
         System.out.println(nextMonth);
     }

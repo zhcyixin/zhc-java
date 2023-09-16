@@ -73,7 +73,7 @@ public class CacheHoleController {
     // 通过定义一个原子类变量，记录查询数据库次数
     private AtomicInteger atomicInteger = new AtomicInteger();
 
-    @PostConstruct
+//    @PostConstruct
     public void wrongInit() {
         //初始化1000个地区数据到Redis，所有缓存数据有效期30秒
         IntStream.rangeClosed(1, 1000).forEach(i ->

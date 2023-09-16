@@ -3,6 +3,7 @@ package com.zhc;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author zhouhengchao
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @MapperScan(basePackages = {"com.zhc.dao","com.zhc.controller.hole.transactional"})
+@EnableScheduling
 public class ZhcJavaApplication {
 
     public static void main(String[] args) {

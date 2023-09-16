@@ -15,7 +15,8 @@ import java.util.List;
 
 /**
  * 相信很多小伙伴工作中都有遇到过自动生成指定规则的字符串作为密码，对密码进行规则性校验，并输出自定义规则校验提示，
- * 今天给大家分享一个开源项目，让你优雅轻松实现复杂密码规则校验、自定义密码生成规则、快速简单应对项目密码要求，通过公司安全组规范。
+ * 今天给大家分享一个开源项目，让你优雅轻松实现复杂密码规则校验、自定义密码生成规则、快速简单应对项目密码要求，
+ * 通过公司安全组规范。
  * 只需要引入依赖
  * <dependency>
 *   <groupId>org.passay</groupId>
@@ -85,8 +86,8 @@ public class PasswordUtilTest {
 
         PasswordValidator qqValidator = new PasswordValidator(rules);
         // 该密码字符不包含大写和特殊字符，应该检查不通过
-        String pass = "12345678a";
-        //String pass = "A1234%5678a";
+        //String pass = "12345678a";
+        String pass = "A1234%5678a";
         RuleResult ruleResult = qqValidator.validate(new PasswordData(pass));
         if(!ruleResult.isValid()){
             for(RuleResultDetail detail: ruleResult.getDetails()){

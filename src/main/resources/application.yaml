@@ -4,6 +4,8 @@ server:
     #threads:
      # max: 1
 spring:
+  main:
+    allow-circular-references: true
   redis:
     host: localhost
     port: 6379
