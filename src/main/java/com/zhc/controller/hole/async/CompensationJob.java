@@ -29,7 +29,7 @@ public class CompensationJob {
     private MemberService memberService;
     private long offset = 0;
 
-    @Scheduled(initialDelay = 10_000, fixedRate = 5_000)
+//    @Scheduled(initialDelay = 10_000, fixedRate = 5_000)
     public void compensationJob() {
         log.info("开始从用户ID {} 补偿", offset);
         userService.getUsersAfterIdWithLimit(offset, 5).forEach(user -> {
