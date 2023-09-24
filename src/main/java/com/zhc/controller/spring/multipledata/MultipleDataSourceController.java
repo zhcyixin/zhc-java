@@ -1,7 +1,9 @@
-package com.zhc.controller.spring;
+package com.zhc.controller.spring.multipledata;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 相信很多小伙伴在工作中都遇到过多数据源应用场景，Spring对多数据源提供很便利的支持，只需要包含以下几步：
+ * 相信很多小伙伴在工作中都遇到过多数据源应用场景，一般多数据源需求包含以下三种情况：
+ * 1、项目业务需求需要连接其他业务数据库，例如订单数据库、商品数据库；
+ * 2、项目采用读写分离技术架构，从库读和主库写场景；
+ * 3、项目数据量较大，采用分库设计。
+ * 今天主要分享两种多数据源实现方式：
+ * 1、基于Spring dynamic-datasource-spring-boot-starter实现；
+ * 2、多数据源属性配置，通过属性的依赖注入
+ * Spring对多数据源提供很便利的支持，只需要包含以下几步：
  * 1、引入多数据源starter依赖
  *         <dependency>
  *             <groupId>com.baomidou</groupId>
