@@ -116,6 +116,17 @@
             <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
             <version>3.5.1</version>
         </dependency>
+        <!--添加参数校验依赖-->
+        <dependency>
+             <groupId>org.hibernate.validator</groupId>
+             <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.12</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
