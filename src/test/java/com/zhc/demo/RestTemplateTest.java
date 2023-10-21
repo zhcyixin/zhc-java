@@ -148,7 +148,7 @@ public class RestTemplateTest {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         Student studentRequest = new Student(1,"hello","12345",18);
-        HttpEntity<?> httpEntity = new HttpEntity<>(studentRequest,httpHeaders);
+        HttpEntity<Student> httpEntity = new HttpEntity<>(studentRequest,httpHeaders);
 
         ResponseEntity<Student> resultEntity = restTemplate.exchange(url,HttpMethod.POST,httpEntity ,Student.class);
         Student student = resultEntity.getBody();
@@ -159,4 +159,12 @@ public class RestTemplateTest {
         log.info("response body:{}",student);
         log.info("response student name :{}",student.getName());
     }
+
+    /**
+     * 注意：
+     * 1、通过RestTemplate可以很方便在代码中进行请求的调用，与Spring boot项目轻松集成；
+     * 2、exchange方法可以很方便的支持get、post、put、delete请求，非常方便；
+     * 3、如果返回参数中包含泛型参数，可以使用ParameterizedTypeReference定义返回参数，避免获取泛型参数时进行强制转化。
+     *
+     */
 }
