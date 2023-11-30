@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhc.dao.UserDao">
+
+    <resultMap type="com.zhc.model.entity.User" id="UserMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="gender" column="gender" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="isDeleted" column="is_deleted" jdbcType="BIT"/>
+        <result property="source" column="source" jdbcType="INTEGER"/>
+        <result property="idCard" column="id_card" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMap">
+        select
+          id, name, age, mobile, create_time, update_time, email, gender, status, is_deleted, source, id_card
+        from user
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserMap">
+        select
+          id, name, age, mobile, create_time, update_time, email, gender, status, is_deleted, source, id_card
+        from user
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="age != null">
+                and age = #{age}
+            </if>
+            <if test="mobile != null and mobile != ''">
+                and mobile = #{mobile}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="gender != null">
+                and gender = #{gender}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+            <if test="source != null">
+                and source = #{source}
+            </if>
+            <if test="idCard != null and idCard != ''">
+                and id_card = #{idCard}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="age != null">
+                and age = #{age}
+            </if>
+            <if test="mobile != null and mobile != ''">
+                and mobile = #{mobile}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="gender != null">
+                and gender = #{gender}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+            <if test="source != null">
+                and source = #{source}
+            </if>
+            <if test="idCard != null and idCard != ''">
+                and id_card = #{idCard}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into user(name, age, mobile, create_time, update_time, email, gender, status, is_deleted, source, id_card)
+        values (#{name}, #{age}, #{mobile}, #{createTime}, #{updateTime}, #{email}, #{gender}, #{status}, #{isDeleted}, #{source}, #{idCard})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user(name, age, mobile, create_time, update_time, email, gender, status, is_deleted, source, id_card)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.name}, #{entity.age}, #{entity.mobile}, #{entity.createTime}, #{entity.updateTime}, #{entity.email}, #{entity.gender}, #{entity.status}, #{entity.isDeleted}, #{entity.source}, #{entity.idCard})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into user(name, age, mobile, create_time, update_time, email, gender, status, is_deleted, source, id_card)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.name}, #{entity.age}, #{entity.mobile}, #{entity.createTime}, #{entity.updateTime}, #{entity.email}, #{entity.gender}, #{entity.status}, #{entity.isDeleted}, #{entity.source}, #{entity.idCard})
+        </foreach>
+        on duplicate key update
+        name = values(name),
+        age = values(age),
+        mobile = values(mobile),
+        create_time = values(create_time),
+        update_time = values(update_time),
+        email = values(email),
+        gender = values(gender),
+        status = values(status),
+        is_deleted = values(is_deleted),
+        source = values(source),
+        id_card = values(id_card)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="mobile != null and mobile != ''">
+                mobile = #{mobile},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            <if test="source != null">
+                source = #{source},
+            </if>
+            <if test="idCard != null and idCard != ''">
+                id_card = #{idCard},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from user where id = #{id}
+    </delete>
+
+    <!--按照条件查询用户信息-->
+    <select id="findUserList" resultMap="UserMap" parameterType="com.zhc.model.bo.UserSearchRequestBO">
+        select
+        id, name, age, mobile, create_time, update_time, email, gender, status, is_deleted, source, id_card
+        from user
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="mobile != null and mobile != ''">
+                and mobile like concat('%', #{mobile, jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="createTimeStart != null">
+                and create_time >= #{createTimeStart, jdbcType=TIMESTAMP}
+            </if>
+            <if test="createTimeEnd != null">
+                and create_time  &lt;= #{createTimeEnd, jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+
+</mapper>
+
