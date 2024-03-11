@@ -4,6 +4,11 @@ server:
     #threads:
      # max: 1
 spring:
+  #Spring 添加mongodb连接配置
+  data:
+    mongodb:
+      database: test
+      uri: mongodb://admin:123456@localhost:27017
   mvc:
     pathmatch:
       matching-strategy=ANT_PATH_MATCHER: ANT_PATH_MATCHER

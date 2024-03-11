@@ -21,5 +21,9 @@
 ##### 添加多数据源demo示例
 ##### 添加Spring参数校验示例demo
 ##### 添加Spring WebMvcConfigure拦截器使用示例
+##### 添加Spring RestTemplate API 使用示例
+##### 添加Spring Swagger + Mybatis开发CRUD使用示例
+##### 添加Spring Jackson API操作json使用示例
+##### 添加Spring MongoDB 集成及基本操作使用示例
 
 #### 欢迎小伙伴们一起学习，如果对您有帮助记得给个stars
