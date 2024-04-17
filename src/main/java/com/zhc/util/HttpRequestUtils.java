@@ -39,15 +39,7 @@ public final class HttpRequestUtils {
             //.setStaleConnectionCheckEnabled(true)
             .build();
 
-    //释放资源，httpResponse为响应流，httpClient为请求客户端
-    private static void release(CloseableHttpResponse httpResponse, CloseableHttpClient httpClient) throws IOException {
-        if (httpResponse != null) {
-            httpResponse.close();
-        }
-        if (httpClient != null) {
-            httpClient.close();
-        }
-    }
+
 
     //get请求带参数、带请求头
     public static String get(String urlWithParams, Map<String, String> header) throws IOException {
@@ -92,6 +84,7 @@ public final class HttpRequestUtils {
         return send(RequestBuilder.post(url), paramsMap);
     }
 
+    // region 私有方法
     private static String send(RequestBuilder requestBuilder, Map<String, Object> paramsMap){
         CloseableHttpClient httpClient = HttpClients.createDefault();
         requestBuilder.setCharset(Charset.forName(CHARSET));
@@ -123,4 +116,15 @@ public final class HttpRequestUtils {
         return responseText;
 
     }
+
+    //释放资源，httpResponse为响应流，httpClient为请求客户端
+    private static void release(CloseableHttpResponse httpResponse, CloseableHttpClient httpClient) throws IOException {
+        if (httpResponse != null) {
+            httpResponse.close();
+        }
+        if (httpClient != null) {
+            httpClient.close();
+        }
+    }
+    // endregion
 }
